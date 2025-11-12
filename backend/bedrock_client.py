@@ -216,5 +216,85 @@ Respond with ONLY the category name (one word)."""
         except Exception as e:
             print(f"Error classifying report: {e}")
             return 'other'
+    
+    def chat_recommendation(self, user_query: str, buildings: List[Dict], accessibility_data: List[Dict]) -> str:
+        """
+        Generate AI-powered recommendations based on user query
+        
+        Args:
+            user_query: User's question/request (e.g., "find me a study spot", "where are accessible lifts")
+            buildings: List of building dictionaries with occupancy and status
+            accessibility_data: List of accessibility information
+        
+        Returns:
+            AI-generated response with recommendations
+        """
+        # Format building data for context
+        buildings_context = []
+        for building in buildings:
+            occupancy_pct = (building.get('occupancy', 0) / building.get('capacity', 100) * 100) if building.get('capacity', 100) > 0 else 0
+            buildings_context.append(
+                f"- {building['name']} ({building['id']}): {building.get('status', 'quiet')} status, "
+                f"{occupancy_pct:.1f}% occupied ({building.get('occupancy', 0)}/{building.get('capacity', 100)}), "
+                f"Location: {building.get('lat', 'N/A')}, {building.get('lon', 'N/A')}"
+            )
+        
+        # Format accessibility data for context
+        accessibility_context = []
+        for acc in accessibility_data:
+            building_name = next((b['name'] for b in buildings if b['id'] == acc['building_id']), acc['building_id'])
+            accessibility_context.append(
+                f"- {building_name} ({acc['building_id']}): {acc['elevators']} elevators, "
+                f"{acc['accessible_washrooms']} accessible washrooms. {acc['notes']}"
+            )
+        
+        prompt = f"""You are a helpful campus assistant for CampusFlow. Answer user questions about study spots, accessibility, and building recommendations.
+
+Campus Buildings Data:
+{chr(10).join(buildings_context)}
+
+Accessibility Information:
+{chr(10).join(accessibility_context)}
+
+User Query: "{user_query}"
+
+Instructions:
+1. If the user asks about study spots, recommend buildings with "quiet" status and low occupancy (<50%)
+2. If the user asks about accessibility (lifts, elevators, wheelchair access), provide specific information from the accessibility data
+3. Be conversational, helpful, and specific
+4. Include building names, occupancy percentages, and any relevant details
+5. If asking about distance/location, mention that buildings are on campus
+6. Format your response in a friendly, easy-to-read way
+
+Response:"""
+
+        try:
+            response = self.bedrock_runtime.invoke_model(
+                modelId=self.model_id,
+                body=json.dumps({
+                    "anthropic_version": "bedrock-2023-05-31",
+                    "max_tokens": 1000,
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ]
+                }),
+                contentType="application/json"
+            )
+            
+            response_body = json.loads(response['body'].read())
+            content = response_body.get('content', [])
+            
+            if content and len(content) > 0:
+                return content[0].get('text', 'I apologize, but I could not generate a response. Please try rephrasing your question.')
+            else:
+                return 'I apologize, but I could not generate a response. Please try rephrasing your question.'
+        
+        except Exception as e:
+            print(f"Error in chat recommendation: {e}")
+            # Fallback response
+            return f"I encountered an error processing your request. Please try again or rephrase your question. Error: {str(e)}"
 
 

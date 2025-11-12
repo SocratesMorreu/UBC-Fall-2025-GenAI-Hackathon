@@ -135,7 +135,150 @@
       "elevators": 4,
       "accessible_washrooms": 7,
       "notes": "Fully accessible student center with multiple services"
+    },
+    {
+      "building_id": "ponderosa",
+      "wheelchair_entrances": [
+        {"lat": 49.2640, "lon": -123.2490, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2641, "lon": -123.2489, "description": "North entrance - ramp"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 6,
+      "notes": "Fully accessible residence with dining facilities"
+    },
+    {
+      "building_id": "orchard",
+      "wheelchair_entrances": [
+        {"lat": 49.2580, "lon": -123.2430, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2581, "lon": -123.2429, "description": "South entrance - ramp"}
+      ],
+      "elevators": 4,
+      "accessible_washrooms": 5,
+      "notes": "Fully accessible residence with modern facilities"
+    },
+    {
+      "building_id": "aquatic",
+      "wheelchair_entrances": [
+        {"lat": 49.2590, "lon": -123.2480, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2591, "lon": -123.2479, "description": "Pool entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 4,
+      "notes": "Fully accessible with pool lift and accessible changing rooms"
+    },
+    {
+      "building_id": "rec",
+      "wheelchair_entrances": [
+        {"lat": 49.2610, "lon": -123.2490, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2611, "lon": -123.2489, "description": "Gym entrance - ramp"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 5,
+      "notes": "Fully accessible recreation center with accessible equipment"
+    },
+    {
+      "building_id": "bookstore",
+      "wheelchair_entrances": [
+        {"lat": 49.2608, "lon": -123.2462, "description": "Main entrance - automatic doors"}
+      ],
+      "elevators": 1,
+      "accessible_washrooms": 2,
+      "notes": "Ground floor fully accessible"
+    },
+    {
+      "building_id": "sub",
+      "wheelchair_entrances": [
+        {"lat": 49.2603, "lon": -123.2459, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2604, "lon": -123.2458, "description": "East entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 4,
+      "notes": "Fully accessible student union building"
+    },
+    {
+      "building_id": "bio",
+      "wheelchair_entrances": [
+        {"lat": 49.2622, "lon": -123.2472, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2623, "lon": -123.2471, "description": "Lab entrance - ramp"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 4,
+      "notes": "Most floors accessible, some upper floor labs may have limited access"
+    },
+    {
+      "building_id": "earth",
+      "wheelchair_entrances": [
+        {"lat": 49.2632, "lon": -123.2478, "description": "Main entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Ground and first floor fully accessible"
+    },
+    {
+      "building_id": "civil",
+      "wheelchair_entrances": [
+        {"lat": 49.2588, "lon": -123.2448, "description": "Main entrance - automatic doors"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Most floors accessible"
+    },
+    {
+      "building_id": "electrical",
+      "wheelchair_entrances": [
+        {"lat": 49.2592, "lon": -123.2452, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2593, "lon": -123.2451, "description": "Lab entrance - ramp"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 4,
+      "notes": "Fully accessible with accessible computer labs"
+    },
+    {
+      "building_id": "mech",
+      "wheelchair_entrances": [
+        {"lat": 49.2598, "lon": -123.2458, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2599, "lon": -123.2457, "description": "Workshop entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Most areas accessible, some workshop areas may have limited access"
+    },
+    {
+      "building_id": "music",
+      "wheelchair_entrances": [
+        {"lat": 49.2618, "lon": -123.2468, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2619, "lon": -123.2467, "description": "Performance entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Fully accessible with accessible practice rooms"
+    },
+    {
+      "building_id": "chan",
+      "wheelchair_entrances": [
+        {"lat": 49.2625, "lon": -123.2465, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2626, "lon": -123.2464, "description": "Stage entrance - accessible"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 4,
+      "notes": "Fully accessible performance venue with accessible seating"
+    },
+    {
+      "building_id": "education",
+      "wheelchair_entrances": [
+        {"lat": 49.2612, "lon": -123.2452, "description": "Main entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Fully accessible education building"
+    },
+    {
+      "building_id": "irving",
+      "wheelchair_entrances": [
+        {"lat": 49.2607, "lon": -123.2461, "description": "East wing entrance - automatic doors"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Fully accessible study spaces in east wing"
     }
   ]
-  
-  

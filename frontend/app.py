@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 import streamlit_folium as st_folium
 
-from map_utils import create_campus_map, load_buildings, load_accessibility, get_smart_recommendations
+from map_utils import create_campus_map, load_buildings, load_accessibility
 from api_client import APIClient
 
 # Page configuration
@@ -29,6 +29,10 @@ if 'user_role' not in st.session_state:
     st.session_state.user_role = 'student'  # 'student' or 'admin'
 if 'selected_building_for_recommendations' not in st.session_state:
     st.session_state.selected_building_for_recommendations = None
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
+if 'chat_input' not in st.session_state:
+    st.session_state.chat_input = ''
 
 # Initialize API client
 api_client = APIClient()
@@ -222,6 +226,52 @@ st.markdown("""
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
+    
+    .chat-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-message {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin: 0.5rem 0;
+        border-left: 4px solid #667eea;
+    }
+    
+    .chat-user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-left-color: #764ba2;
+    }
+    
+    .stTextArea>div>div>textarea {
+        background-color: white !important;
+        color: #1f2937 !important;
+        border-radius: 0.75rem;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .stTextArea>div>div>textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        color: #1f2937 !important;
+        background-color: white !important;
+    }
+    
+    .stTextArea>div>div>textarea::placeholder {
+        color: #9ca3af !important;
+    }
+    
+    /* Ensure text input is visible */
+    input[type="text"], textarea {
+        color: #1f2937 !important;
+        background-color: white !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -234,75 +284,116 @@ def main():
     buildings = load_buildings()
     building_names = {b['id']: b['name'] for b in buildings}
     
-    # Sidebar controls
+    # Sidebar - AI Chatbot as main feature
     with st.sidebar:
-        st.header("🎛️ Controls")
+        # AI Chatbot Section - Prominent Panel
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem;
+                    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);">
+            <h2 style="color: white; margin: 0; text-align: center;">🤖 AI Assistant</h2>
+            <p style="color: rgba(255,255,255,0.9); text-align: center; margin-top: 0.5rem; font-size: 0.9em;">
+                Ask me anything about campus!
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Role-based view toggle
-        st.subheader("👤 View Mode")
+        # Chat input with better styling
+        st.markdown("### 💡 I Can Help With")
+        st.markdown(
+            """
+            - Find quiet study spots and building occupancy
+            - Suggest alternative spaces when areas are busy
+            - Share accessibility entrances, elevators, and amenities
+            - Explain how to submit and track campus reports
+            - Answer campus services, dining, and facility questions
+            """,
+            help="Focused on campus knowledge powered by our real-time data and reporting tools."
+        )
+
+        st.markdown("### 💬 Ask Your Question")
+        chat_query = st.text_area(
+            "",
+            placeholder="Ask me anything! Examples:\n• 'I'm at IKB and it's full, where should I go?'\n• 'Find me a quiet study spot'\n• 'Where are accessible lifts?'\n• 'What's the weather today?'\n• 'How do I register for classes?'\n• 'Where can I get food on campus?'",
+            key="chat_input_field",
+            height=120,
+            label_visibility="collapsed"
+        )
+        
+        col_ask, col_clear = st.columns([2, 1])
+        with col_ask:
+            ask_button = st.button("🚀 Ask AI", type="primary", use_container_width=True, key="chat_submit")
+        with col_clear:
+            if st.button("🗑️", use_container_width=True, key="clear_chat", help="Clear chat history"):
+                st.session_state.chat_history = []
+                st.rerun()
+        
+        if ask_button and chat_query.strip():
+            with st.spinner("🤔 Thinking..."):
+                response = api_client.chat(chat_query)
+                # Add to chat history
+                st.session_state.chat_history.append({
+                    "query": chat_query,
+                    "response": response,
+                    "timestamp": datetime.now().strftime("%H:%M")
+                })
+                st.rerun()
+        
+        # Display chat history in a scrollable container
+        if st.session_state.chat_history:
+            st.markdown("---")
+            st.markdown("### 💬 Conversation History")
+            # Show most recent first
+            for i, chat in enumerate(reversed(st.session_state.chat_history[-10:])):  # Show last 10
+                with st.container():
+                    # User message
+                    st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.5rem;
+                                color: white;">
+                        <div style="font-size: 0.7em; opacity: 0.9; margin-bottom: 0.25rem;">{chat['timestamp']} • You</div>
+                        <div style="font-weight: 500; color: white;">{chat['query']}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # AI response
+                    st.markdown(f"""
+                    <div style="background: white; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;
+                                border-left: 3px solid #667eea; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 0.7em; color: #6b7280; margin-bottom: 0.25rem;">AI Assistant</div>
+                        <div style="color: #1f2937; white-space: pre-wrap; line-height: 1.6;">{chat['response']}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+        
+        st.divider()
+        
+        # Quick actions
+        st.markdown("### ⚡ Quick Actions")
+        col1, col2 = st.columns(2)
+        with col1:
+            show_trends = st.button("📈 Trends", use_container_width=True)
+        with col2:
+            report_issue = st.button("📝 Report", use_container_width=True)
+        
+        st.divider()
+        
+        # Map options (minimal)
+        st.markdown("### 🗺️ Map Options")
+        show_accessibility = st.checkbox("View Accessibility", value=False)
+        show_heatmap = st.checkbox("Show Occupancy Heatmap", value=False)
+        
+        st.divider()
+        
+        # Role toggle
+        st.markdown("### 👤 View Mode")
         user_role = st.radio(
             "Select your role:",
             options=["👩‍🎓 Student View", "🧰 Admin View"],
             index=0 if st.session_state.user_role == 'student' else 1,
-            key="role_selector"
+            key="role_selector",
+            label_visibility="collapsed"
         )
         st.session_state.user_role = 'student' if "Student" in user_role else 'admin'
-        
-        st.divider()
-        
-        # Search functionality
-        st.subheader("🔍 Search")
-        search_query = st.text_input(
-            "Search buildings...",
-            placeholder="Type building name...",
-            key="search_input"
-        )
-        
-        # Map options
-        st.subheader("🗺️ Map Options")
-        show_accessibility = st.checkbox("View Accessibility", value=False)
-        show_heatmap = st.checkbox("Show Occupancy Heatmap", value=False)
-        auto_refresh = st.checkbox("Auto-refresh (30s)", value=False)
-        
-        st.divider()
-        
-        # Status filter
-        st.subheader("📊 Filters")
-        status_filter = st.multiselect(
-            "Filter by Status",
-            options=["quiet", "busy", "broken"],
-            default=["quiet", "busy", "broken"]
-        )
-        
-        # Occupancy filter
-        occupancy_range = st.slider(
-            "Occupancy Range (%)",
-            min_value=0,
-            max_value=100,
-            value=(0, 100),
-            step=5
-        )
-        
-        # Building filter
-        building_options = ["All"] + list(building_names.values())
-        if search_query:
-            building_options = ["All"] + [name for name in building_names.values() 
-                                         if search_query.lower() in name.lower()]
-        
-        selected_building = st.selectbox(
-            "Filter by Building",
-            options=building_options
-        )
-        
-        st.divider()
-        
-        # Action buttons
-        st.subheader("⚡ Actions")
-        col1, col2 = st.columns(2)
-        with col1:
-            show_trends = st.button("📈 Trends", type="primary", use_container_width=True)
-        with col2:
-            report_issue = st.button("📝 Report", use_container_width=True)
         
         st.divider()
         
@@ -312,7 +403,7 @@ def main():
         st.markdown("🟠 **Orange** = Busy")
         st.markdown("🔴 **Red** = Broken/Issues")
         
-        # Real-time stats
+        # Quick stats
         st.divider()
         st.markdown("### 📊 Quick Stats")
         total_buildings = len(buildings)
@@ -327,31 +418,8 @@ def main():
         st.metric("Busy Buildings", busy_count)
         st.metric("Quiet Buildings", quiet_count)
     
-    # Filter buildings based on selections
+    # No filters - show all buildings
     filtered_buildings = buildings.copy()
-    
-    # Apply status filter
-    if status_filter:
-        filtered_buildings = [b for b in filtered_buildings if b['status'] in status_filter]
-    
-    # Apply occupancy filter
-    filtered_buildings = [
-        b for b in filtered_buildings
-        if occupancy_range[0] <= (b.get('occupancy', 0) / b.get('capacity', 100) * 100) <= occupancy_range[1]
-    ]
-    
-    # Apply building filter
-    if selected_building != "All":
-        building_id = next((b['id'] for b in buildings if b['name'] == selected_building), None)
-        if building_id:
-            filtered_buildings = [b for b in filtered_buildings if b['id'] == building_id]
-    
-    # Apply search filter
-    if search_query:
-        filtered_buildings = [
-            b for b in filtered_buildings
-            if search_query.lower() in b['name'].lower()
-        ]
     
     # Main content area
     col1, col2 = st.columns([2, 1])
@@ -376,58 +444,7 @@ def main():
             clicked_building = map_data['last_object_clicked_popup']
             st.success(f"📍 Selected: {clicked_building}")
         
-        # Auto-refresh functionality (using placeholder for now)
-        if auto_refresh:
-            st.info("🔄 Auto-refresh enabled - page will refresh every 30 seconds")
-            # Note: In production, use st.rerun() with a timer or implement server-side refresh
         
-        # Smart Recommendations Section (Student View)
-        if st.session_state.user_role == 'student':
-            st.divider()
-            st.subheader("💡 Smart Recommendations")
-            
-            # Building selector for recommendations
-            recommendation_building = st.selectbox(
-                "I'm currently at:",
-                options=["Select a building..."] + list(building_names.values()),
-                key="recommendation_building_selector"
-            )
-            
-            if recommendation_building and recommendation_building != "Select a building...":
-                building_id = next((b['id'] for b in buildings if b['name'] == recommendation_building), None)
-                if building_id:
-                    current_building = next((b for b in buildings if b['id'] == building_id), None)
-                    if current_building:
-                        occupancy_pct = (current_building.get('occupancy', 0) / current_building.get('capacity', 100) * 100) if current_building.get('capacity', 100) > 0 else 0
-                        
-                        # Show recommendations if building is busy
-                        if occupancy_pct >= 50 or current_building.get('status') == 'busy':
-                            recommendations = get_smart_recommendations(building_id, buildings, max_recommendations=3)
-                            
-                            if recommendations:
-                                st.info(f"**{current_building['name']}** is {current_building['status']} ({occupancy_pct:.0f}% full). Here are some quiet alternatives:")
-                                
-                                for i, rec in enumerate(recommendations, 1):
-                                    rec_building = rec['building']
-                                    with st.container():
-                                        rec_html = f"""
-                                        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
-                                                    padding: 1rem; border-radius: 0.75rem; margin: 0.5rem 0;
-                                                    border-left: 4px solid #3b82f6; animation: slideInRight 0.5s ease-out;">
-                                            <strong style="color: #1e40af;">{i}. {rec_building['name']}</strong>
-                                            <div style="margin-top: 0.5rem; color: #475569;">
-                                                📍 {rec['distance_km']} km away • 🚶 {rec['walk_time_minutes']} min walk
-                                            </div>
-                                            <div style="color: #64748b; font-size: 0.9em;">
-                                                {rec['occupancy_pct']}% occupied • {rec_building.get('status', 'quiet').title()}
-                                            </div>
-                                        </div>
-                                        """
-                                        st.markdown(rec_html, unsafe_allow_html=True)
-                            else:
-                                st.info("No quiet alternatives found nearby. All buildings are busy!")
-                        else:
-                            st.success(f"✅ **{current_building['name']}** is quiet ({occupancy_pct:.0f}% full). Great spot to study!")
     
     with col2:
         # Role-based content

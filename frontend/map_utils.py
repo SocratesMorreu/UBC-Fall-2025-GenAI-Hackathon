@@ -56,16 +56,29 @@ def create_campus_map(
     Returns:
         Folium Map object
     """
-    # Create base map with better tile layer
+    # Create base map with Street View as default (OpenStreetMap)
     campus_map = folium.Map(
         location=[center_lat, center_lon],
         zoom_start=zoom,
-        tiles='CartoDB positron'  # Cleaner, modern look
+        tiles='OpenStreetMap',  # Street View as default
+        prefer_canvas=False
     )
     
-    # Add alternative tile layers
-    folium.TileLayer('OpenStreetMap').add_to(campus_map)
-    folium.TileLayer('CartoDB dark_matter').add_to(campus_map)
+    # Add all tile layer options - IMPORTANT: Don't add the default layer again
+    # Light mode
+    folium.TileLayer('CartoDB positron', name='Light Mode', overlay=False, control=True).add_to(campus_map)
+    
+    # Dark mode
+    folium.TileLayer('CartoDB dark_matter', name='Dark Mode', overlay=False, control=True).add_to(campus_map)
+    
+    # Satellite view using Esri World Imagery
+    folium.TileLayer(
+        tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        attr='Esri',
+        name='Satellite View',
+        overlay=False,
+        control=True
+    ).add_to(campus_map)
     
     # Load building data if not provided
     if buildings is None:
@@ -162,20 +175,37 @@ def create_campus_map(
     
     # Add enhanced legend with dark text
     legend_html = """
-    <div style="position: fixed; 
-                bottom: 50px; left: 50px; width: 220px; 
-                background-color: white; border: 2px solid #e5e7eb; border-radius: 8px; 
-                z-index:9999; font-size:14px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-    <h4 style="margin: 0 0 10px 0; color: #111827; font-weight: bold;">Building Status</h4>
-    <p style="margin: 5px 0; color: #374151;"><span style="color:#3b82f6; font-size: 18px;">🔵</span> <strong style="color: #111827;">Quiet</strong> <span style="color: #6b7280;">- Low occupancy</span></p>
-    <p style="margin: 5px 0; color: #374151;"><span style="color:#f59e0b; font-size: 18px;">🟠</span> <strong style="color: #111827;">Busy</strong> <span style="color: #6b7280;">- High occupancy</span></p>
-    <p style="margin: 5px 0; color: #374151;"><span style="color:#ef4444; font-size: 18px;">🔴</span> <strong style="color: #111827;">Issues</strong> <span style="color: #6b7280;">- Needs attention</span></p>
+    <div style="position: absolute; 
+                bottom: 20px; right: 20px; width: 220px; 
+                background-color: rgba(255, 255, 255, 0.95); border: 2px solid #e5e7eb; border-radius: 8px; 
+                z-index: 9999; font-size: 14px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                pointer-events: none;">
+      <h4 style="margin: 0 0 10px 0; color: #111827; font-weight: bold;">Building Status</h4>
+      <p style="margin: 5px 0; color: #374151;">
+        <span style="font-size: 18px;">🔵</span> 
+        <strong style="color: #111827;">Quiet</strong> 
+        <span style="color: #6b7280;">- Low occupancy</span>
+      </p>
+      <p style="margin: 5px 0; color: #374151;">
+        <span style="font-size: 18px;">🟠</span> 
+        <strong style="color: #111827;">Busy</strong> 
+        <span style="color: #6b7280;">- High occupancy</span>
+      </p>
+      <p style="margin: 5px 0; color: #374151;">
+        <span style="font-size: 18px;">🔴</span> 
+        <strong style="color: #111827;">Issues</strong> 
+        <span style="color: #6b7280;">- Needs attention</span>
+      </p>
     </div>
     """
     campus_map.get_root().html.add_child(folium.Element(legend_html))
     
-    # Add layer control
-    folium.LayerControl().add_to(campus_map)
+    # Add layer control with all base layers
+    folium.LayerControl(
+        position='topright',
+        collapsed=False,
+        autoZIndex=True
+    ).add_to(campus_map)
     
     # Add fullscreen button
     plugins.Fullscreen().add_to(campus_map)

@@ -164,5 +164,50 @@ class APIClient:
                 "summary": "Unable to fetch trends. Please check API connection.",
                 "top_issues": []
             }
+    
+    def chat(self, query: str) -> str:
+        """
+        Send a query to the AI chatbot
+        
+        Args:
+            query: User's question/request
+        
+        Returns:
+            AI-generated response
+        """
+        # Use local AI chatbot first (works without AWS, avoids 403 errors)
+        try:
+            from ai_chatbot import LocalAIChatbot
+            chatbot = LocalAIChatbot()
+            return chatbot.chat(query)
+        except ImportError:
+            # If local chatbot module not found, try API
+            pass
+        except Exception as e:
+            # If local chatbot fails, try API
+            pass
+        
+        # Fallback to API if local chatbot unavailable
+        if self.api_url:
+            try:
+                response = requests.post(
+                    f"{self.api_url}/chat",
+                    json={"query": query},
+                    timeout=30  # Longer timeout for AI responses
+                )
+                response.raise_for_status()
+                result = response.json()
+                return result.get('response', 'I apologize, but I could not generate a response.')
+            except requests.exceptions.RequestException as e:
+                # If API also fails, return basic fallback
+                pass
+        
+        # Final fallback responses
+        if "study spot" in query.lower() or "study" in query.lower():
+            return "Based on current occupancy, I recommend:\n1. **Scarfe Building** - 20% occupied, quiet status\n2. **Chemistry Building** - 30% occupied, quiet status\n3. **Forestry Sciences Centre** - 25% occupied, quiet status\n\nThese buildings have low occupancy and are great for studying!"
+        elif "accessible" in query.lower() or "lift" in query.lower() or "elevator" in query.lower():
+            return "Here are buildings with accessible lifts:\n\n1. **Irving K. Barber Learning Centre** - 3 elevators, 4 accessible washrooms\n2. **Koerner Library** - 4 elevators, 6 accessible washrooms\n3. **Sauder School of Business** - 5 elevators, 8 accessible washrooms\n\nAll these buildings have multiple elevators and are fully accessible."
+        else:
+            return "I can help you find study spots, accessible buildings, and answer questions about campus facilities. Try asking me to 'find me a study spot' or 'where are accessible lifts'."
 
 

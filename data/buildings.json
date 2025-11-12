@@ -6,7 +6,9 @@
     "lon": -123.2460,
     "status": "busy",
     "occupancy": 85,
-    "capacity": 100
+    "capacity": 100,
+    "type": "library",
+    "amenities": ["study spaces", "computers", "printing", "group rooms"]
   },
   {
     "id": "scarfe",
@@ -15,7 +17,9 @@
     "lon": -123.2450,
     "status": "quiet",
     "occupancy": 20,
-    "capacity": 100
+    "capacity": 100,
+    "type": "academic",
+    "amenities": ["classrooms", "study areas", "cafeteria"]
   },
   {
     "id": "life",
@@ -24,7 +28,9 @@
     "lon": -123.2470,
     "status": "quiet",
     "occupancy": 35,
-    "capacity": 150
+    "capacity": 150,
+    "type": "science",
+    "amenities": ["labs", "study spaces", "lecture halls"]
   },
   {
     "id": "buchanan",
@@ -33,7 +39,9 @@
     "lon": -123.2455,
     "status": "busy",
     "occupancy": 90,
-    "capacity": 120
+    "capacity": 120,
+    "type": "academic",
+    "amenities": ["classrooms", "offices", "study areas"]
   },
   {
     "id": "nest",
@@ -42,7 +50,9 @@
     "lon": -123.2465,
     "status": "busy",
     "occupancy": 95,
-    "capacity": 200
+    "capacity": 200,
+    "type": "student center",
+    "amenities": ["food court", "study spaces", "meeting rooms", "gym"]
   },
   {
     "id": "koerner",
@@ -51,7 +61,9 @@
     "lon": -123.2445,
     "status": "quiet",
     "occupancy": 45,
-    "capacity": 180
+    "capacity": 180,
+    "type": "library",
+    "amenities": ["quiet study", "books", "computers", "group rooms"]
   },
   {
     "id": "woodward",
@@ -60,7 +72,9 @@
     "lon": -123.2480,
     "status": "busy",
     "occupancy": 110,
-    "capacity": 150
+    "capacity": 150,
+    "type": "library",
+    "amenities": ["study spaces", "medical resources", "computers"]
   },
   {
     "id": "chemistry",
@@ -69,7 +83,9 @@
     "lon": -123.2475,
     "status": "quiet",
     "occupancy": 30,
-    "capacity": 100
+    "capacity": 100,
+    "type": "science",
+    "amenities": ["labs", "study areas", "lecture halls"]
   },
   {
     "id": "math",
@@ -78,7 +94,9 @@
     "lon": -123.2440,
     "status": "busy",
     "occupancy": 85,
-    "capacity": 120
+    "capacity": 120,
+    "type": "academic",
+    "amenities": ["classrooms", "study areas", "tutoring"]
   },
   {
     "id": "sauder",
@@ -87,7 +105,9 @@
     "lon": -123.2455,
     "status": "busy",
     "occupancy": 140,
-    "capacity": 200
+    "capacity": 200,
+    "type": "business",
+    "amenities": ["classrooms", "study spaces", "café", "trading lab"]
   },
   {
     "id": "forestry",
@@ -96,7 +116,9 @@
     "lon": -123.2465,
     "status": "quiet",
     "occupancy": 25,
-    "capacity": 80
+    "capacity": 80,
+    "type": "science",
+    "amenities": ["labs", "study areas", "library"]
   },
   {
     "id": "allard",
@@ -105,7 +127,9 @@
     "lon": -123.2475,
     "status": "busy",
     "occupancy": 95,
-    "capacity": 130
+    "capacity": 130,
+    "type": "law",
+    "amenities": ["law library", "study spaces", "moot court", "café"]
   },
   {
     "id": "henning",
@@ -114,7 +138,9 @@
     "lon": -123.2460,
     "status": "quiet",
     "occupancy": 40,
-    "capacity": 90
+    "capacity": 90,
+    "type": "academic",
+    "amenities": ["classrooms", "study areas"]
   },
   {
     "id": "student_union",
@@ -123,8 +149,173 @@
     "lon": -123.2458,
     "status": "busy",
     "occupancy": 180,
-    "capacity": 250
+    "capacity": 250,
+    "type": "student center",
+    "amenities": ["food court", "study spaces", "services", "events"]
+  },
+  {
+    "id": "ponderosa",
+    "name": "Ponderosa Commons",
+    "lat": 49.2640,
+    "lon": -123.2490,
+    "status": "quiet",
+    "occupancy": 50,
+    "capacity": 150,
+    "type": "residence",
+    "amenities": ["dining", "study spaces", "residence", "common areas"]
+  },
+  {
+    "id": "orchard",
+    "name": "Orchard Commons",
+    "lat": 49.2580,
+    "lon": -123.2430,
+    "status": "quiet",
+    "occupancy": 45,
+    "capacity": 120,
+    "type": "residence",
+    "amenities": ["dining", "study spaces", "residence", "gym"]
+  },
+  {
+    "id": "aquatic",
+    "name": "Aquatic Centre",
+    "lat": 49.2590,
+    "lon": -123.2480,
+    "status": "busy",
+    "occupancy": 80,
+    "capacity": 100,
+    "type": "recreation",
+    "amenities": ["pool", "gym", "locker rooms", "fitness classes"]
+  },
+  {
+    "id": "rec",
+    "name": "Student Recreation Centre",
+    "lat": 49.2610,
+    "lon": -123.2490,
+    "status": "busy",
+    "occupancy": 120,
+    "capacity": 200,
+    "type": "recreation",
+    "amenities": ["gym", "basketball courts", "fitness equipment", "locker rooms"]
+  },
+  {
+    "id": "bookstore",
+    "name": "UBC Bookstore",
+    "lat": 49.2608,
+    "lon": -123.2462,
+    "status": "busy",
+    "occupancy": 60,
+    "capacity": 80,
+    "type": "retail",
+    "amenities": ["books", "supplies", "clothing", "café"]
+  },
+  {
+    "id": "sub",
+    "name": "Student Union Building (SUB)",
+    "lat": 49.2603,
+    "lon": -123.2459,
+    "status": "busy",
+    "occupancy": 100,
+    "capacity": 150,
+    "type": "student center",
+    "amenities": ["food", "study spaces", "services", "events"]
+  },
+  {
+    "id": "bio",
+    "name": "Biological Sciences Building",
+    "lat": 49.2622,
+    "lon": -123.2472,
+    "status": "quiet",
+    "occupancy": 40,
+    "capacity": 100,
+    "type": "science",
+    "amenities": ["labs", "study areas", "lecture halls", "greenhouse"]
+  },
+  {
+    "id": "earth",
+    "name": "Earth Sciences Building",
+    "lat": 49.2632,
+    "lon": -123.2478,
+    "status": "quiet",
+    "occupancy": 35,
+    "capacity": 90,
+    "type": "science",
+    "amenities": ["labs", "study areas", "geology collections"]
+  },
+  {
+    "id": "civil",
+    "name": "Civil Engineering Building",
+    "lat": 49.2588,
+    "lon": -123.2448,
+    "status": "quiet",
+    "occupancy": 30,
+    "capacity": 80,
+    "type": "engineering",
+    "amenities": ["labs", "study areas", "workshops"]
+  },
+  {
+    "id": "electrical",
+    "name": "Electrical Engineering Building",
+    "lat": 49.2592,
+    "lon": -123.2452,
+    "status": "busy",
+    "occupancy": 75,
+    "capacity": 100,
+    "type": "engineering",
+    "amenities": ["labs", "study areas", "computer labs"]
+  },
+  {
+    "id": "mech",
+    "name": "Mechanical Engineering Building",
+    "lat": 49.2598,
+    "lon": -123.2458,
+    "status": "quiet",
+    "occupancy": 50,
+    "capacity": 110,
+    "type": "engineering",
+    "amenities": ["labs", "study areas", "workshops", "machine shop"]
+  },
+  {
+    "id": "music",
+    "name": "Music Building",
+    "lat": 49.2618,
+    "lon": -123.2468,
+    "status": "quiet",
+    "occupancy": 25,
+    "capacity": 70,
+    "type": "arts",
+    "amenities": ["practice rooms", "recital hall", "study areas", "instruments"]
+  },
+  {
+    "id": "chan",
+    "name": "Chan Centre",
+    "lat": 49.2625,
+    "lon": -123.2465,
+    "status": "quiet",
+    "occupancy": 20,
+    "capacity": 60,
+    "type": "arts",
+    "amenities": ["concert hall", "rehearsal spaces", "study areas"]
+  },
+  {
+    "id": "education",
+    "name": "Education Building",
+    "lat": 49.2612,
+    "lon": -123.2452,
+    "status": "quiet",
+    "occupancy": 30,
+    "capacity": 85,
+    "type": "academic",
+    "amenities": ["classrooms", "study areas", "library"]
+  },
+  {
+    "id": "irving",
+    "name": "Irving K. Barber Learning Centre - East Wing",
+    "lat": 49.2607,
+    "lon": -123.2461,
+    "status": "quiet",
+    "occupancy": 40,
+    "capacity": 80,
+    "type": "library",
+    "amenities": ["study spaces", "group rooms", "computers"]
   }
 ]
-
-
