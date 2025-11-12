@@ -1,6 +1,6 @@
 # ubica (CampusFlow) 🏛️
 
-UBica is a campus intelligence copilot: it blends live occupancy data, predictive flow modeling, and conversational GenAI to help students and staff find quiet spaces, report issues, and plan their day. The system leans heavily on AWS managed services (API Gateway, Lambda, DynamoDB, S3, CloudWatch) together with AWS Bedrock (Claude 3) – with optional OpenAI GPT integration for extended answers.
+UBica is a campus intelligence copilot: it blends occupancy data, predictive flow modeling, and conversational GenAI to help students and staff find quiet spaces, report issues, and plan their day. The system leans heavily on AWS managed services (API Gateway, Lambda, DynamoDB, S3, CloudWatch) together with AWS Bedrock (Claude 3)–with optional OpenAI GPT integration for extended answers.
 
 ## Features
 
@@ -48,22 +48,6 @@ UBica is a campus intelligence copilot: it blends live occupancy data, predictiv
 │  (Claude 3)     │      │  (Assets & Logs)  │
 └─────────────────┘      └───────────────────┘
 ```
-
-Optional OpenAI GPT support is provided via the same API client abstraction – drop your `OPENAI_API_KEY` into `.env` and the assistant upgrades automatically.
-
-```mermaid
-flowchart TD
-    A[Streamlit Frontend<br/>ubica] -->|HTTPS| B(API Gateway)
-    A --> H[Local Mock Data<br/>issues.json / predictions.json]
-    B --> C[AWS Lambda<br/>backend/lambda_function.py]
-    C --> D[DynamoDB<br/>CampusReports]
-    C --> E[S3<br/>Issue Photos]
-    C --> F[AWS Bedrock<br/>Claude 3 Sonnet]
-    C --> G[CloudWatch Logs/Insights]
-    A --> I[Optional OpenAI GPT<br/>ai_api_client.py]
-    A --> J[Web Search<br/>DuckDuckGo / SerpAPI]
-```
-
 ## Project Structure
 
 ```

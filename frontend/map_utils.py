@@ -58,28 +58,45 @@ def create_campus_map(
     Returns:
         Folium Map object
     """
-    # Create base map with Street View as default (OpenStreetMap)
+    # Create base map without default tiles
     campus_map = folium.Map(
         location=[center_lat, center_lon],
         zoom_start=zoom,
-        tiles='OpenStreetMap',  # Street View as default
+        tiles=None,
         prefer_canvas=False
     )
     
-    # Add all tile layer options - IMPORTANT: Don't add the default layer again
-    # Light mode
-    folium.TileLayer('CartoDB positron', name='Light Mode', overlay=False, control=True).add_to(campus_map)
-    
-    # Dark mode
-    folium.TileLayer('CartoDB dark_matter', name='Dark Mode', overlay=False, control=True).add_to(campus_map)
-    
-    # Satellite view using Esri World Imagery
+    # Add base tile layers explicitly so they appear in layer control
     folium.TileLayer(
-        tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        attr='Esri',
-        name='Satellite View',
-        overlay=False,
-        control=True
+        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        name="🗺️ Street View",
+        attr="© OpenStreetMap contributors",
+        control=True,
+        show=True
+    ).add_to(campus_map)
+    
+    folium.TileLayer(
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+        name="🌤️ Light View",
+        attr="© OpenStreetMap contributors © CARTO",
+        control=True,
+        show=False
+    ).add_to(campus_map)
+    
+    folium.TileLayer(
+        tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+        name="🌙 Dark View",
+        attr="© OpenStreetMap contributors © CARTO",
+        control=True,
+        show=False
+    ).add_to(campus_map)
+    
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        name="🛰️ Satellite View",
+        attr="Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+        control=True,
+        show=False
     ).add_to(campus_map)
     
     # Load building data if not provided
