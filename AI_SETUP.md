@@ -33,9 +33,7 @@ The chatbot now supports integration with **OpenAI GPT** or **Anthropic Claude**
 
 ### What the AI Can Do
 
-- Answer complex student questions
 - Provide detailed study spot recommendations
-- Help with registration (Workday)
 - Campus navigation and building info
 - General knowledge with web search integration
 
