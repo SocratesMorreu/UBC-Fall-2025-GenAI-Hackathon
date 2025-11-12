@@ -19,7 +19,7 @@ Perfect for testing the UI and frontend functionality.
    ```
 
 3. **Open your browser:**
-   - The app will open at `http://localhost:8501`
+   - The app will open at `http://localhost:8502`
    - You can interact with the map and UI
    - Reports will use mock data (no AWS connection needed)
 
