@@ -1,0 +1,130 @@
+[
+  {
+    "id": "ikb",
+    "name": "Irving K. Barber Learning Centre",
+    "lat": 49.2606,
+    "lon": -123.2460,
+    "status": "busy",
+    "occupancy": 85,
+    "capacity": 100
+  },
+  {
+    "id": "scarfe",
+    "name": "Neville Scarfe Building",
+    "lat": 49.2615,
+    "lon": -123.2450,
+    "status": "quiet",
+    "occupancy": 20,
+    "capacity": 100
+  },
+  {
+    "id": "life",
+    "name": "Life Sciences Centre",
+    "lat": 49.2620,
+    "lon": -123.2470,
+    "status": "quiet",
+    "occupancy": 35,
+    "capacity": 150
+  },
+  {
+    "id": "buchanan",
+    "name": "Buchanan Building",
+    "lat": 49.2595,
+    "lon": -123.2455,
+    "status": "busy",
+    "occupancy": 90,
+    "capacity": 120
+  },
+  {
+    "id": "nest",
+    "name": "AMS Nest",
+    "lat": 49.2600,
+    "lon": -123.2465,
+    "status": "busy",
+    "occupancy": 95,
+    "capacity": 200
+  },
+  {
+    "id": "koerner",
+    "name": "Koerner Library",
+    "lat": 49.2610,
+    "lon": -123.2445,
+    "status": "quiet",
+    "occupancy": 45,
+    "capacity": 180
+  },
+  {
+    "id": "woodward",
+    "name": "Woodward Library",
+    "lat": 49.2630,
+    "lon": -123.2480,
+    "status": "busy",
+    "occupancy": 110,
+    "capacity": 150
+  },
+  {
+    "id": "chemistry",
+    "name": "Chemistry Building",
+    "lat": 49.2625,
+    "lon": -123.2475,
+    "status": "quiet",
+    "occupancy": 30,
+    "capacity": 100
+  },
+  {
+    "id": "math",
+    "name": "Mathematics Building",
+    "lat": 49.2590,
+    "lon": -123.2440,
+    "status": "busy",
+    "occupancy": 85,
+    "capacity": 120
+  },
+  {
+    "id": "sauder",
+    "name": "Sauder School of Business",
+    "lat": 49.2605,
+    "lon": -123.2455,
+    "status": "busy",
+    "occupancy": 140,
+    "capacity": 200
+  },
+  {
+    "id": "forestry",
+    "name": "Forestry Sciences Centre",
+    "lat": 49.2635,
+    "lon": -123.2465,
+    "status": "quiet",
+    "occupancy": 25,
+    "capacity": 80
+  },
+  {
+    "id": "allard",
+    "name": "Allard Hall (Law)",
+    "lat": 49.2615,
+    "lon": -123.2475,
+    "status": "busy",
+    "occupancy": 95,
+    "capacity": 130
+  },
+  {
+    "id": "henning",
+    "name": "Henning Building",
+    "lat": 49.2585,
+    "lon": -123.2460,
+    "status": "quiet",
+    "occupancy": 40,
+    "capacity": 90
+  },
+  {
+    "id": "student_union",
+    "name": "Student Union Building",
+    "lat": 49.2602,
+    "lon": -123.2458,
+    "status": "busy",
+    "occupancy": 180,
+    "capacity": 250
+  }
+]
+
+

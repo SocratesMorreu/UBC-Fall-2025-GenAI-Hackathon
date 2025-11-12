@@ -1,0 +1,88 @@
+{
+  "ikb": {
+    "current": 85,
+    "capacity": 100,
+    "trend": "increasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "scarfe": {
+    "current": 20,
+    "capacity": 100,
+    "trend": "stable",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "life": {
+    "current": 35,
+    "capacity": 150,
+    "trend": "decreasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "buchanan": {
+    "current": 90,
+    "capacity": 120,
+    "trend": "increasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "nest": {
+    "current": 95,
+    "capacity": 200,
+    "trend": "stable",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "koerner": {
+    "current": 45,
+    "capacity": 180,
+    "trend": "decreasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "woodward": {
+    "current": 110,
+    "capacity": 150,
+    "trend": "increasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "chemistry": {
+    "current": 30,
+    "capacity": 100,
+    "trend": "stable",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "math": {
+    "current": 85,
+    "capacity": 120,
+    "trend": "increasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "sauder": {
+    "current": 140,
+    "capacity": 200,
+    "trend": "increasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "forestry": {
+    "current": 25,
+    "capacity": 80,
+    "trend": "stable",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "allard": {
+    "current": 95,
+    "capacity": 130,
+    "trend": "increasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "henning": {
+    "current": 40,
+    "capacity": 90,
+    "trend": "decreasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  },
+  "student_union": {
+    "current": 180,
+    "capacity": 250,
+    "trend": "increasing",
+    "last_updated": "2024-01-15T14:30:00Z"
+  }
+}
+
+

@@ -1,0 +1,141 @@
+[
+    {
+      "building_id": "ikb",
+      "wheelchair_entrances": [
+        {"lat": 49.2606, "lon": -123.2460, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2607, "lon": -123.2459, "description": "Side entrance - ramp access"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 4,
+      "notes": "All floors accessible via elevators"
+    },
+    {
+      "building_id": "scarfe",
+      "wheelchair_entrances": [
+        {"lat": 49.2615, "lon": -123.2450, "description": "Main entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 2,
+      "notes": "Ground and first floor accessible"
+    },
+    {
+      "building_id": "life",
+      "wheelchair_entrances": [
+        {"lat": 49.2620, "lon": -123.2470, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2621, "lon": -123.2469, "description": "South entrance - ramp"}
+      ],
+      "elevators": 4,
+      "accessible_washrooms": 6,
+      "notes": "Fully accessible building"
+    },
+    {
+      "building_id": "buchanan",
+      "wheelchair_entrances": [
+        {"lat": 49.2595, "lon": -123.2455, "description": "Main entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Most floors accessible"
+    },
+    {
+      "building_id": "nest",
+      "wheelchair_entrances": [
+        {"lat": 49.2600, "lon": -123.2465, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2601, "lon": -123.2464, "description": "East entrance - ramp"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 5,
+      "notes": "Fully accessible, multiple entrances"
+    },
+    {
+      "building_id": "koerner",
+      "wheelchair_entrances": [
+        {"lat": 49.2610, "lon": -123.2445, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2611, "lon": -123.2444, "description": "North entrance - ramp access"}
+      ],
+      "elevators": 4,
+      "accessible_washrooms": 6,
+      "notes": "Fully accessible library with multiple study floors"
+    },
+    {
+      "building_id": "woodward",
+      "wheelchair_entrances": [
+        {"lat": 49.2630, "lon": -123.2480, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2631, "lon": -123.2479, "description": "West entrance - ramp"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 4,
+      "notes": "All floors accessible, quiet study areas"
+    },
+    {
+      "building_id": "chemistry",
+      "wheelchair_entrances": [
+        {"lat": 49.2625, "lon": -123.2475, "description": "Main entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 3,
+      "notes": "Ground and first floor accessible, labs on upper floors"
+    },
+    {
+      "building_id": "math",
+      "wheelchair_entrances": [
+        {"lat": 49.2590, "lon": -123.2440, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2591, "lon": -123.2439, "description": "South entrance - ramp"}
+      ],
+      "elevators": 3,
+      "accessible_washrooms": 5,
+      "notes": "Fully accessible building with accessible classrooms"
+    },
+    {
+      "building_id": "sauder",
+      "wheelchair_entrances": [
+        {"lat": 49.2605, "lon": -123.2455, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2606, "lon": -123.2454, "description": "East entrance - ramp"},
+        {"lat": 49.2604, "lon": -123.2456, "description": "West entrance - automatic doors"}
+      ],
+      "elevators": 5,
+      "accessible_washrooms": 8,
+      "notes": "Fully accessible modern building with multiple entrances"
+    },
+    {
+      "building_id": "forestry",
+      "wheelchair_entrances": [
+        {"lat": 49.2635, "lon": -123.2465, "description": "Main entrance - ramp"}
+      ],
+      "elevators": 2,
+      "accessible_washrooms": 2,
+      "notes": "Ground and first floor accessible"
+    },
+    {
+      "building_id": "allard",
+      "wheelchair_entrances": [
+        {"lat": 49.2615, "lon": -123.2475, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2616, "lon": -123.2474, "description": "North entrance - ramp"}
+      ],
+      "elevators": 4,
+      "accessible_washrooms": 6,
+      "notes": "Fully accessible modern law building"
+    },
+    {
+      "building_id": "henning",
+      "wheelchair_entrances": [
+        {"lat": 49.2585, "lon": -123.2460, "description": "Main entrance - ramp"}
+      ],
+      "elevators": 1,
+      "accessible_washrooms": 2,
+      "notes": "Ground floor accessible, limited upper floor access"
+    },
+    {
+      "building_id": "student_union",
+      "wheelchair_entrances": [
+        {"lat": 49.2602, "lon": -123.2458, "description": "Main entrance - automatic doors"},
+        {"lat": 49.2603, "lon": -123.2457, "description": "East entrance - ramp"},
+        {"lat": 49.2601, "lon": -123.2459, "description": "West entrance - automatic doors"}
+      ],
+      "elevators": 4,
+      "accessible_washrooms": 7,
+      "notes": "Fully accessible student center with multiple services"
+    }
+  ]
+  
+  
