@@ -7,18 +7,39 @@ import json
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
+from collections import Counter
 import streamlit_folium as st_folium
+from streamlit.components.v1 import html
 
-from map_utils import create_campus_map, load_buildings, load_accessibility
+from map_utils import create_campus_map, load_buildings, load_accessibility, calculate_distance
 from api_client import APIClient
 
 # Page configuration
 st.set_page_config(
-    page_title="CampusFlow",
+    page_title="ubica",
     page_icon="🏛️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+DATA_DIR = Path(__file__).parent.parent / "data"
+
+
+def load_json_data(filename: str, default):
+    path = DATA_DIR / filename
+    try:
+        with open(path, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return default
+
+
+def load_issues_data():
+    return load_json_data("issues.json", [])
+
+
+def load_predictions_data():
+    return load_json_data("predictions.json", {})
 
 # Initialize session state
 if 'reports' not in st.session_state:
@@ -277,12 +298,15 @@ st.markdown("""
 
 def main():
     # Header
-    st.markdown('<h1 class="main-header">🏛️ CampusFlow</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">🏛️ ubica</h1>', unsafe_allow_html=True)
     st.markdown('<div style="text-align: center; margin-bottom: 2rem; animation: fadeIn 0.8s ease-out;"><h3>Safe, Visual, Data-Driven Campus Management</h3></div>', unsafe_allow_html=True)
     
     # Load buildings data
     buildings = load_buildings()
     building_names = {b['id']: b['name'] for b in buildings}
+    building_lookup = {b['id']: b for b in buildings}
+    issues = load_issues_data()
+    predictions = load_predictions_data()
     
     # Sidebar - AI Chatbot as main feature
     with st.sidebar:
@@ -299,22 +323,10 @@ def main():
         """, unsafe_allow_html=True)
         
         # Chat input with better styling
-        st.markdown("### 💡 I Can Help With")
-        st.markdown(
-            """
-            - Find quiet study spots and building occupancy
-            - Suggest alternative spaces when areas are busy
-            - Share accessibility entrances, elevators, and amenities
-            - Explain how to submit and track campus reports
-            - Answer campus services, dining, and facility questions
-            """,
-            help="Focused on campus knowledge powered by our real-time data and reporting tools."
-        )
-
         st.markdown("### 💬 Ask Your Question")
         chat_query = st.text_area(
             "",
-            placeholder="Ask me anything! Examples:\n• 'I'm at IKB and it's full, where should I go?'\n• 'Find me a quiet study spot'\n• 'Where are accessible lifts?'\n• 'What's the weather today?'\n• 'How do I register for classes?'\n• 'Where can I get food on campus?'",
+            placeholder="Need help finding space or reporting an issue? Try:\n• “IKB is full, where do I go?”\n• “Help me log an accessibility issue.”\n• “Show me quiet spots nearby.”\n• “What buildings have open group rooms?”",
             key="chat_input_field",
             height=120,
             label_visibility="collapsed"
@@ -365,15 +377,7 @@ def main():
                     </div>
                     """, unsafe_allow_html=True)
         
-        st.divider()
-        
-        # Quick actions
-        st.markdown("### ⚡ Quick Actions")
-        col1, col2 = st.columns(2)
-        with col1:
-            show_trends = st.button("📈 Trends", use_container_width=True)
-        with col2:
-            report_issue = st.button("📝 Report", use_container_width=True)
+        report_issue = st.button("📝 Report an Issue", use_container_width=True)
         
         st.divider()
         
@@ -381,6 +385,14 @@ def main():
         st.markdown("### 🗺️ Map Options")
         show_accessibility = st.checkbox("View Accessibility", value=False)
         show_heatmap = st.checkbox("Show Occupancy Heatmap", value=False)
+        
+        st.divider()
+
+        # Wayfinder
+        st.markdown("### 🧭 Wayfinder")
+        building_list = ["Select a building..."] + list(building_names.values())
+        start_building_name = st.selectbox("From", building_list, key="wayfinder_start")
+        end_building_name = st.selectbox("To", building_list, key="wayfinder_end")
         
         st.divider()
         
@@ -396,12 +408,6 @@ def main():
         st.session_state.user_role = 'student' if "Student" in user_role else 'admin'
         
         st.divider()
-        
-        # Status legend
-        st.markdown("### 📋 Status Legend")
-        st.markdown("🔵 **Blue** = Quiet")
-        st.markdown("🟠 **Orange** = Busy")
-        st.markdown("🔴 **Red** = Broken/Issues")
         
         # Quick stats
         st.divider()
@@ -420,106 +426,114 @@ def main():
     
     # No filters - show all buildings
     filtered_buildings = buildings.copy()
-    
-    # Main content area
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.header("🗺️ Campus Map")
-        
-        # Show filter info
-        if len(filtered_buildings) != len(buildings):
-            st.info(f"Showing {len(filtered_buildings)} of {len(buildings)} buildings")
-        
-        # Create and display map
-        campus_map = create_campus_map(
-            show_accessibility=show_accessibility,
-            show_heatmap=show_heatmap,
-            buildings=filtered_buildings
+
+    st.header("🗺️ Campus Map")
+
+    # Prepare wayfinder route
+    route_points = None
+    route_details = None
+    if (
+        start_building_name
+        and end_building_name
+        and start_building_name != "Select a building..."
+        and end_building_name != "Select a building..."
+        and start_building_name != end_building_name
+    ):
+        start_building = next((b for b in buildings if b['name'] == start_building_name), None)
+        end_building = next((b for b in buildings if b['name'] == end_building_name), None)
+        if start_building and end_building:
+            route_points = [
+                (start_building['lat'], start_building['lon']),
+                (end_building['lat'], end_building['lon'])
+            ]
+            distance_km = calculate_distance(
+                start_building['lat'], start_building['lon'],
+                end_building['lat'], end_building['lon']
+            )
+            walk_time_minutes = int((distance_km / 5) * 60) if distance_km > 0 else 0
+            route_details = {
+                "from": start_building_name,
+                "to": end_building_name,
+                "distance_km": distance_km,
+                "walk_time_minutes": walk_time_minutes
+            }
+
+    # Create and display map
+    campus_map = create_campus_map(
+        show_accessibility=show_accessibility,
+        show_heatmap=show_heatmap,
+        buildings=filtered_buildings,
+        wayfinder_route=route_points
+    )
+    map_data = st_folium.st_folium(campus_map, width=900, height=600)
+
+    # Handle map interactions
+    if map_data.get('last_object_clicked_popup'):
+        clicked_building = map_data['last_object_clicked_popup']
+        st.success(f"📍 Selected: {clicked_building}")
+
+    if route_details:
+        st.info(
+            f"🧭 Route from **{route_details['from']}** to **{route_details['to']}** · "
+            f"{route_details['distance_km']:.2f} km · 🚶 {route_details['walk_time_minutes']} min walk"
         )
-        map_data = st_folium.st_folium(campus_map, width=700, height=600)
-        
-        # Handle map interactions
-        if map_data.get('last_object_clicked_popup'):
-            clicked_building = map_data['last_object_clicked_popup']
-            st.success(f"📍 Selected: {clicked_building}")
-        
-        
-    
-    with col2:
-        # Role-based content
-        if st.session_state.user_role == 'admin':
-            st.header("🧰 Admin Dashboard")
-            
-            # Admin-specific metrics
-            col_metric1, col_metric2 = st.columns(2)
-            with col_metric1:
-                total_reports = len(st.session_state.reports) if st.session_state.reports else 0
-                st.metric("Total Reports", total_reports)
-            with col_metric2:
-                busy_buildings = sum(1 for b in buildings if b['status'] == 'busy')
-                st.metric("Busy Buildings", busy_buildings)
-            
-            st.divider()
-        
-        st.header("📊 Summary")
-        
-        # Load and display trends (both views, but more prominent in admin)
-        if st.session_state.user_role == 'admin' or show_trends or st.session_state.trends:
-            if not st.session_state.trends:
-                with st.spinner("Fetching trends..."):
-                    st.session_state.trends = api_client.get_trends()
-            
-            trends = st.session_state.trends
-            st.markdown('<div class="summary-box">', unsafe_allow_html=True)
-            st.subheader("📈 Today's Trends")
-            st.write(trends.get('summary', 'No trends available'))
-            
-            if trends.get('top_issues'):
-                st.subheader("🔝 Top 3 Issues")
-                for i, issue in enumerate(trends['top_issues'][:3], 1):
-                    building_name = building_names.get(issue['building'], issue['building'])
-                    st.markdown(f"**{i}.** {building_name}")
-                    st.markdown(f"   *{issue['issue_type']}* ({issue['count']} reports)")
-            st.markdown('</div>', unsafe_allow_html=True)
+
+    if predictions:
+        st.divider()
+        st.subheader("🔮 Predictive Flow")
+        time_slots = list(predictions.keys())
+        selected_slot = st.selectbox(
+            "Plan ahead:",
+            time_slots,
+            index=0,
+            key="prediction_slot"
+        )
+
+        slot_predictions = predictions.get(selected_slot, [])
+        if slot_predictions:
+            for rec in slot_predictions:
+                building = building_lookup.get(rec.get("building"))
+                if not building:
+                    continue
+
+                predicted_occ = rec.get("predicted_occupancy", 0)
+                walk_time = rec.get("walk_time_minutes")
+                confidence = rec.get("confidence", "High")
+                note = rec.get("note", "")
+                best_time = rec.get("best_time", selected_slot)
+                amenities = ", ".join(building.get("amenities", [])[:3])
+
+                st.markdown(f"**{building['name']}** · {best_time} · {confidence} confidence")
+                if walk_time is not None:
+                    st.caption(f"🚶 Approx. {walk_time} min walk")
+                st.progress(min(1.0, predicted_occ / 100))
+                details = f"Predicted occupancy: {predicted_occ:.0f}%"
+                if amenities:
+                    details += f" • Amenities: {amenities}"
+                st.caption(details)
+                if note:
+                    st.caption(f"💡 {note}")
         else:
-            st.info("💡 Click '📈 Trends' to see AI-generated insights")
-        
-        # Building status summary with enhanced visuals
-        st.subheader("🏛️ Building Status")
-        
-        # Sort by occupancy percentage
-        sorted_buildings = sorted(
-            filtered_buildings,
-            key=lambda x: x.get('occupancy', 0) / x.get('capacity', 100) if x.get('capacity', 100) > 0 else 0,
-            reverse=True
-        )
-        
-        for building in sorted_buildings[:10]:  # Show top 10
-            status = building.get('status', 'quiet')
-            status_emoji = {"quiet": "🔵", "busy": "🟠", "broken": "🔴"}.get(status, "⚪")
-            occupancy_pct = (building.get('occupancy', 0) / building.get('capacity', 100) * 100) if building.get('capacity', 100) > 0 else 0
-            
-            # Create building card HTML with dark text colors
-            status_class = f"status-{status}"
-            building_html = f"""
-            <div class="building-card {status_class}" style="color: #111827;">
-                <strong style="color: #111827; font-size: 1rem;">{status_emoji} {building['name']}</strong>
-                <div style="margin-top: 0.5rem; color: #6b7280;">
-                    <small style="color: #6b7280;">{status.title()} • {building.get('occupancy', 0)}/{building.get('capacity', 0)} ({occupancy_pct:.0f}%)</small>
-                </div>
-            </div>
-            """
-            st.markdown(building_html, unsafe_allow_html=True)
-            
-            # Progress bar with color coding
-            progress_value = building.get('occupancy', 0) / building.get('capacity', 100) if building.get('capacity', 100) > 0 else 0
-            if occupancy_pct >= 80:
-                st.progress(progress_value)
-            elif occupancy_pct >= 50:
-                st.progress(progress_value)
-            else:
-                st.progress(progress_value)
+            st.caption("No predictive data for this time window yet. Check another slot.")
+
+    if st.session_state.user_role == 'admin':
+        st.divider()
+        st.subheader("🛠️ Admin Overview")
+        open_issues = [issue for issue in issues if issue.get("status") == "open"]
+        high_severity = [issue for issue in open_issues if issue.get("severity") == "high"]
+        col_admin1, col_admin2, col_admin3 = st.columns(3)
+        col_admin1.metric("Open Issues", len(open_issues))
+        col_admin2.metric("High Severity", len(high_severity))
+        col_admin3.metric("Total Reports (mock)", len(issues))
+
+        hotspot_counter = Counter(issue.get("building") for issue in open_issues)
+        if hotspot_counter:
+            st.markdown("**Hotspots**")
+            for building_id, count in hotspot_counter.most_common(3):
+                building_label = building_names.get(building_id, building_id)
+                st.markdown(f"- {building_label}: {count} open issue(s)")
+        else:
+            st.caption("No active hotspots – great job!")
     
     # Report Issue Modal
     if report_issue:
@@ -580,11 +594,17 @@ def main():
                             severity=severity,
                             photo_url=photo_url
                         )
-                        
-                        if response.get('statusCode') == 200 or 'message' in response:
+                        response_status = response.get('statusCode', 0)
+                        try:
+                            response_status = int(response_status)
+                        except (TypeError, ValueError):
+                            response_status = 0
+                        if 200 <= response_status < 300:
                             st.success("✅ Report submitted successfully!")
                             st.session_state.show_report_form = False
                             st.session_state.trends = None  # Reset trends to refresh
+                            st.session_state.reports = st.session_state.get('reports', [])
+                            st.session_state.reports.append(response.get('issue', {}))
                             st.rerun()
                         else:
                             st.error(f"❌ Error submitting report: {response.get('error', 'Unknown error')}")

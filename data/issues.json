@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ISS-001",
+    "building": "ikb",
+    "issue_type": "crowd",
+    "severity": "high",
+    "status": "open",
+    "reported_at": "2024-01-15T09:30:00Z",
+    "description": "Main atrium is at capacity and seating is unavailable."
+  },
+  {
+    "id": "ISS-002",
+    "building": "nest",
+    "issue_type": "crowd",
+    "severity": "medium",
+    "status": "open",
+    "reported_at": "2024-01-15T10:05:00Z",
+    "description": "Food court lineups stretching into main corridor."
+  },
+  {
+    "id": "ISS-003",
+    "building": "sauder",
+    "issue_type": "outlet",
+    "severity": "high",
+    "status": "open",
+    "reported_at": "2024-01-15T08:45:00Z",
+    "description": "Group study rooms on level 3 have no power."
+  },
+  {
+    "id": "ISS-004",
+    "building": "koerner",
+    "issue_type": "temperature",
+    "severity": "medium",
+    "status": "in_progress",
+    "reported_at": "2024-01-15T07:55:00Z",
+    "description": "4th floor silent study zone is too cold."
+  },
+  {
+    "id": "ISS-005",
+    "building": "chemistry",
+    "issue_type": "accessibility",
+    "severity": "high",
+    "status": "open",
+    "reported_at": "2024-01-15T11:10:00Z",
+    "description": "South entrance ramp is slippery due to frost."
+  },
+  {
+    "id": "ISS-006",
+    "building": "ponderosa",
+    "issue_type": "crowd",
+    "severity": "medium",
+    "status": "resolved",
+    "reported_at": "2024-01-14T19:20:00Z",
+    "description": "Evening dining rush causing long waits."
+  }
+]

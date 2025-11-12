@@ -8,6 +8,8 @@ import boto3
 from typing import Dict, List, Optional
 from dotenv import load_dotenv
 from datetime import datetime
+from pathlib import Path
+from collections import Counter
 
 load_dotenv()
 
@@ -70,15 +72,32 @@ class APIClient:
             Response dictionary from API
         """
         if not self.api_url:
-            # Mock response for local development
-            return {
-                "statusCode": 200,
-                "body": json.dumps({
-                    "message": "Report submitted (mock mode)",
+            try:
+                issues = self._load_mock_issues()
+                timestamp = datetime.utcnow().isoformat() + "Z"
+                issue_id = f"ISS-{int(datetime.utcnow().timestamp())}"
+                new_issue = {
+                    "id": issue_id,
                     "building": building,
-                    "issue_type": issue_type
-                })
-            }
+                    "issue_type": issue_type,
+                    "severity": severity,
+                    "status": "open",
+                    "reported_at": timestamp,
+                    "description": description,
+                    "photo_url": photo_url
+                }
+                issues.append(new_issue)
+                self._save_mock_issues(issues)
+                return {
+                    "statusCode": 200,
+                    "issue": new_issue,
+                    "message": "Report submitted (local mode)"
+                }
+            except Exception as e:
+                return {
+                    "statusCode": 500,
+                    "error": f"Unable to write report locally: {e}"
+                }
         
         payload = {
             "building": building,
@@ -145,15 +164,55 @@ class APIClient:
             Dictionary with trends summary
         """
         if not self.api_url:
-            # Mock summary for local development
-            return {
-                "summary": "Top 3 issues today: 1) Outlet failures in IKB (5 reports), 2) High occupancy at NEST (3 reports), 3) Accessibility concerns at Scarfe (2 reports)",
-                "top_issues": [
-                    {"building": "ikb", "issue_type": "outlet", "count": 5},
-                    {"building": "nest", "issue_type": "crowd", "count": 3},
-                    {"building": "scarfe", "issue_type": "accessibility", "count": 2}
+            issues = self._load_mock_issues()
+            building_lookup = self._load_building_lookup()
+
+            open_issues = [issue for issue in issues if issue.get("status") == "open"]
+            if open_issues:
+                hotspot_counter = Counter(issue.get("building") for issue in open_issues)
+                hotspot_labels = [
+                    f"{building_lookup.get(bid, {}).get('name', bid)} ({count})"
+                    for bid, count in hotspot_counter.most_common(2)
                 ]
-            }
+                hotspot_text = ", ".join(hotspot_labels) if hotspot_labels else "no hotspots"
+
+                critical_issues = [
+                    issue for issue in open_issues if issue.get("severity") == "high"
+                ]
+                critical_labels = [
+                    building_lookup.get(issue.get("building"), {}).get("name", issue.get("building"))
+                    for issue in critical_issues
+                ]
+                critical_text = ", ".join(sorted(set(critical_labels))) or "none"
+
+                summary = (
+                    f"{len(open_issues)} open issues across campus. "
+                    f"Active hotspots: {hotspot_text}. "
+                    f"Critical attention needed at: {critical_text}."
+                )
+
+                combo_counter = Counter(
+                    (issue.get("building"), issue.get("issue_type"))
+                    for issue in open_issues
+                )
+
+                top_issues = []
+                for (building_id, issue_type), count in combo_counter.most_common(5):
+                    top_issues.append({
+                        "building": building_id,
+                        "issue_type": issue_type,
+                        "count": count
+                    })
+
+                return {
+                    "summary": summary,
+                    "top_issues": top_issues
+                }
+            else:
+                return {
+                    "summary": "No open reports right now. Campus looks clear!",
+                    "top_issues": []
+                }
         
         try:
             response = requests.get(f"{self.api_url}/trends", timeout=self.timeout)
@@ -164,6 +223,29 @@ class APIClient:
                 "summary": "Unable to fetch trends. Please check API connection.",
                 "top_issues": []
             }
+
+    def _load_mock_issues(self) -> List[Dict]:
+        path = Path(__file__).parent.parent / "data" / "issues.json"
+        try:
+            with open(path, "r") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return []
+
+    def _save_mock_issues(self, issues: List[Dict]) -> None:
+        path = Path(__file__).parent.parent / "data" / "issues.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as f:
+            json.dump(issues, f, indent=2)
+
+    def _load_building_lookup(self) -> Dict[str, Dict]:
+        path = Path(__file__).parent.parent / "data" / "buildings.json"
+        try:
+            with open(path, "r") as f:
+                buildings = json.load(f)
+                return {b["id"]: b for b in buildings}
+        except FileNotFoundError:
+            return {}
     
     def chat(self, query: str) -> str:
         """

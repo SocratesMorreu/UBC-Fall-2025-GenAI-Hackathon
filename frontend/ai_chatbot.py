@@ -31,6 +31,7 @@ class LocalAIChatbot:
     def __init__(self):
         self.buildings = self._load_buildings()
         self.accessibility_data = self._load_accessibility()
+        self.predictions = self._load_predictions()
         # Initialize web search if available
         if WEB_SEARCH_AVAILABLE and WebSearch:
             self.web_search = WebSearch()
@@ -59,6 +60,15 @@ class LocalAIChatbot:
                 return json.load(f)
         except Exception:
             return []
+    
+    def _load_predictions(self) -> Dict[str, List[Dict]]:
+        """Load predictive occupancy data"""
+        try:
+            data_path = Path(__file__).parent.parent / "data" / "predictions.json"
+            with open(data_path, 'r') as f:
+                return json.load(f)
+        except Exception:
+            return {}
     
     def calculate_distance(self, lat1: float, lon1: float, lat2: float, lon2: float) -> float:
         """Calculate distance between two coordinates in kilometers"""
@@ -162,6 +172,18 @@ class LocalAIChatbot:
                 f"- {building_name}: {acc['elevators']} elevators, {acc['accessible_washrooms']} accessible washrooms. {acc['notes']}"
             )
         
+        if self.predictions:
+            context_parts.append("\nOccupancy Forecasts:")
+            for slot, recs in list(self.predictions.items())[:4]:
+                if not recs:
+                    continue
+                top = recs[0]
+                building_name = next((b['name'] for b in self.buildings if b['id'] == top.get('building')), top.get('building'))
+                context_parts.append(
+                    f"- {slot}: {building_name} at ~{top.get('predicted_occupancy', 0)}% occupancy. "
+                    f"Suggested window: {top.get('best_time', 'N/A')}."
+                )
+        
         return "\n".join(context_parts)
     
     def _extract_location_from_query(self, query: str) -> Optional[str]:
@@ -182,6 +204,87 @@ class LocalAIChatbot:
                     return location
         
         return None
+
+    def _match_prediction_slot(self, query_lower: str) -> Optional[str]:
+        """Match user query to a predictive time slot"""
+        if not self.predictions:
+            return None
+
+        slot_keywords = {
+            "morning": "Morning (7-11 AM)",
+            "before class": "Morning (7-11 AM)",
+            "pre-class": "Morning (7-11 AM)",
+            "midday": "Midday (11 AM-2 PM)",
+            "noon": "Midday (11 AM-2 PM)",
+            "lunch": "Midday (11 AM-2 PM)",
+            "afternoon": "Afternoon (2-6 PM)",
+            "after class": "Afternoon (2-6 PM)",
+            "evening": "Evening (6-10 PM)",
+            "tonight": "Evening (6-10 PM)",
+            "night": "Evening (6-10 PM)"
+        }
+
+        for keyword, slot in slot_keywords.items():
+            if keyword in query_lower and slot in self.predictions:
+                return slot
+
+        time_match = re.search(r"\b(\d{1,2})\s*(am|pm)\b", query_lower)
+        if time_match:
+            hour = int(time_match.group(1)) % 12
+            period = time_match.group(2)
+            if period == "pm":
+                hour += 12
+            if 7 <= hour <= 10 and "Morning (7-11 AM)" in self.predictions:
+                return "Morning (7-11 AM)"
+            if 11 <= hour <= 13 and "Midday (11 AM-2 PM)" in self.predictions:
+                return "Midday (11 AM-2 PM)"
+            if 14 <= hour <= 17 and "Afternoon (2-6 PM)" in self.predictions:
+                return "Afternoon (2-6 PM)"
+            if 18 <= hour <= 22 and "Evening (6-10 PM)" in self.predictions:
+                return "Evening (6-10 PM)"
+
+        if any(keyword in query_lower for keyword in ["later", "predict", "forecast", "plan ahead", "best time"]):
+            return next(iter(self.predictions.keys()), None)
+
+        return None
+
+    def _format_prediction_response(self, slot: str) -> Optional[str]:
+        """Generate a natural language response for a prediction slot"""
+        slot_predictions = self.predictions.get(slot)
+        if not slot_predictions:
+            return None
+
+        heading = f"🔮 **Predicted study flow for {slot}:**\n\n"
+        body_sections = []
+        for rec in slot_predictions[:4]:
+            building = next((b for b in self.buildings if b['id'] == rec.get('building')), None)
+            if not building:
+                continue
+            building_name = building['name']
+            occupancy = rec.get('predicted_occupancy', 0)
+            walk_time = rec.get('walk_time_minutes')
+            best_time = rec.get('best_time', slot)
+            note = rec.get('note', '')
+            confidence = rec.get('confidence', 'High')
+            amenities = ", ".join(building.get('amenities', [])[:3])
+
+            entry_lines = [
+                f"**{building_name}** · {best_time} · {confidence} confidence",
+                f"- Predicted occupancy: {occupancy:.0f}%"
+            ]
+            if walk_time is not None:
+                entry_lines[-1] += f" · 🚶 {walk_time} min walk from IKB"
+            if amenities:
+                entry_lines.append(f"- Amenities: {amenities}")
+            if note:
+                entry_lines.append(f"- 💡 {note}")
+
+            body_sections.append("\n".join(entry_lines))
+
+        if not body_sections:
+            return None
+
+        return heading + "\n\n".join(body_sections) + "\n\n_Need another window? Ask me about morning, midday, afternoon, or evening plans!_"
     
     def chat(self, user_query: str) -> str:
         """
@@ -254,6 +357,12 @@ Guidelines:
         
         # Study spot recommendations
         if any(word in query_lower for word in ['study', 'study spot', 'quiet', 'place to work', 'where can i study']):
+            prediction_slot = self._match_prediction_slot(query_lower)
+            if prediction_slot:
+                prediction_response = self._format_prediction_response(prediction_slot)
+                if prediction_response:
+                    return prediction_response
+
             if current_building:
                 occupancy_pct = (current_building.get('occupancy', 0) / current_building.get('capacity', 100) * 100) if current_building.get('capacity', 100) > 0 else 0
                 
@@ -272,14 +381,21 @@ Guidelines:
                             distance = alt['distance_km']
                             occupancy = alt['occupancy_pct']
                             
-                            response += f"**{i}. {building_name}**\n"
-                            response += f"   🚶 Just {walk_time} minutes away ({distance} km)\n"
-                            response += f"   {occupancy}% occupied - way quieter! ✨\n\n"
+                        response += (
+                            f"**{i}. {building_name}**\n"
+                            f"   🚶 Just {walk_time} minutes away ({distance} km)\n"
+                            f"   {occupancy}% occupied - much calmer! ✨\n\n"
+                        )
                         
                         # Add a friendly closing
                         best_alt = alternatives[0]
-                        response += f"**My top pick:** **{best_alt['building']['name']}** is only {best_alt['walk_time_minutes']} minutes away and at {best_alt['occupancy_pct']}% capacity - perfect for focused studying! 📚\n\n"
-                        response += "Hope this helps! Let me know if you need anything else."
+                        response += (
+                            f"**My top pick:** **{best_alt['building']['name']}** is only "
+                            f"{best_alt['walk_time_minutes']} minutes away and at "
+                            f"{best_alt['occupancy_pct']}% capacity – perfect for focused studying! 📚\n\n"
+                            "Really sorry you couldn't find a spot at your first choice — hopefully one of these feels just right. "
+                            "Need me to route you there or check evening availability?"
+                        )
                         return response
                     else:
                         return f"**{current_building['name']}** is busy ({occupancy_pct:.0f}% full), but I couldn't find nearby quiet alternatives. You might want to check back later or try a different time."
@@ -318,6 +434,15 @@ Guidelines:
                     return response
                 else:
                     return "It looks like most buildings are busy right now. I'd recommend checking back in an hour or trying during off-peak hours (early morning or late evening)."
+        
+        # Predictive flow / planning queries
+        elif self.predictions and any(word in query_lower for word in ['predict', 'prediction', 'forecast', 'later', 'best time', 'plan ahead', 'busy later', 'evening', 'morning', 'afternoon']):
+            prediction_slot = self._match_prediction_slot(query_lower) or next(iter(self.predictions.keys()), None)
+            if prediction_slot:
+                prediction_response = self._format_prediction_response(prediction_slot)
+                if prediction_response:
+                    return prediction_response
+            return "I'm still learning this pattern. Try asking me about study spots or predictions for a specific time of day (morning, midday, afternoon, evening)."
         
         # Accessibility queries
         elif any(word in query_lower for word in ['accessible', 'lift', 'elevator', 'wheelchair', 'access', 'ramp']):

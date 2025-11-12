@@ -40,7 +40,8 @@ def create_campus_map(
     zoom: int = 15,
     show_accessibility: bool = False,
     show_heatmap: bool = False,
-    buildings: Optional[List[Dict]] = None
+    buildings: Optional[List[Dict]] = None,
+    wayfinder_route: Optional[List[Tuple[float, float]]] = None
 ) -> folium.Map:
     """
     Create a Folium map with building markers
@@ -52,6 +53,7 @@ def create_campus_map(
         show_accessibility: Whether to show accessibility markers
         show_heatmap: Whether to show occupancy heatmap
         buildings: Optional list of buildings to display (if None, loads all)
+        wayfinder_route: Optional list of (lat, lon) tuples to render as a walking route
     
     Returns:
         Folium Map object
@@ -173,33 +175,16 @@ def create_campus_map(
             gradient={0.2: 'blue', 0.4: 'cyan', 0.6: 'lime', 0.8: 'yellow', 1.0: 'red'}
         ).add_to(campus_map)
     
-    # Add enhanced legend with dark text
-    legend_html = """
-    <div style="position: absolute; 
-                bottom: 20px; right: 20px; width: 220px; 
-                background-color: rgba(255, 255, 255, 0.95); border: 2px solid #e5e7eb; border-radius: 8px; 
-                z-index: 9999; font-size: 14px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                pointer-events: none;">
-      <h4 style="margin: 0 0 10px 0; color: #111827; font-weight: bold;">Building Status</h4>
-      <p style="margin: 5px 0; color: #374151;">
-        <span style="font-size: 18px;">🔵</span> 
-        <strong style="color: #111827;">Quiet</strong> 
-        <span style="color: #6b7280;">- Low occupancy</span>
-      </p>
-      <p style="margin: 5px 0; color: #374151;">
-        <span style="font-size: 18px;">🟠</span> 
-        <strong style="color: #111827;">Busy</strong> 
-        <span style="color: #6b7280;">- High occupancy</span>
-      </p>
-      <p style="margin: 5px 0; color: #374151;">
-        <span style="font-size: 18px;">🔴</span> 
-        <strong style="color: #111827;">Issues</strong> 
-        <span style="color: #6b7280;">- Needs attention</span>
-      </p>
-    </div>
-    """
-    campus_map.get_root().html.add_child(folium.Element(legend_html))
-    
+    # Add wayfinder route if provided
+    if wayfinder_route and len(wayfinder_route) >= 2:
+        folium.PolyLine(
+            locations=wayfinder_route,
+            color="#2563eb",
+            weight=5,
+            opacity=0.8,
+            dash_array="10"
+        ).add_to(campus_map)
+
     # Add layer control with all base layers
     folium.LayerControl(
         position='topright',

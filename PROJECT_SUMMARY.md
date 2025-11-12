@@ -1,38 +1,39 @@
-# CampusFlow - Project Summary
+# ubica (CampusFlow) - Project Summary
 
 ## ✅ What's Been Built
 
 ### 🎨 Frontend (Streamlit)
 - **Interactive Campus Map** 
   - Folium-based map with building markers
-  - Color-coded status: Blue (quiet), Orange (busy), Red (broken)
   - Clickable markers with building information
-  - Real-time occupancy display
+  - Layer control for street / light / dark / satellite tiles
+  - Wayfinder routing (start → destination) with distance + walk time
+  - Predictive flow panel surfaced under the map
 
 - **User Interface Features**
-  - "Report Issue" button with form
-  - "View Accessibility" checkbox for wheelchair entrances
-  - "Show Trends" button for AI-generated insights
-  - Building status summary panel
-  - Top 3 issues display
+  - Conversational GenAI assistant (local logic + Claude/GPT optional)
+  - "Report Issue" button with photo upload + mock S3
+  - Accessibility toggle for wheelchair entrances
+  - Predictive occupancy selector (Morning/Midday/Afternoon/Evening)
+  - Wayfinder sidebar controls (From/To)
+  - Live summary report counts + hotspots
 
 - **Components**
-  - `frontend/app.py` - Main Streamlit application
-  - `frontend/map_utils.py` - Map rendering utilities
-  - `frontend/api_client.py` - API Gateway client (with mock mode)
+- `frontend/app.py` - Main Streamlit application / predictive UI / wayfinder
+- `frontend/map_utils.py` - Map rendering utilities (routing, layers)
+- `frontend/api_client.py` - API Gateway & Bedrock client (with mock + Claude/GPT)
 
-### 🧠 Backend (AWS Lambda + Bedrock)
+### 🧠 Backend (AWS Lambda + Bedrock + GPT optional)
 - **Lambda Function** (`backend/lambda_function.py`)
   - Handles report submission (POST /report)
   - Retrieves reports (GET /reports)
   - Generates trends (GET /trends)
   - Full CORS support
 
-- **AI Integration** (`backend/bedrock_client.py`)
-  - Claude 3 Sonnet integration via AWS Bedrock
-  - Report summarization
-  - Automatic issue classification
-  - Fallback aggregation if Bedrock unavailable
+- **AI Integration** (`backend/bedrock_client.py`, `frontend/ai_api_client.py`)
+  - Claude 3 Sonnet integration via AWS Bedrock (real-time summarization + classification)
+  - Optional OpenAI GPT integration through a shared client
+  - Local fallback logic (no external API required)
 
 - **Data Layer** (`backend/dynamodb_client.py`)
   - DynamoDB operations
@@ -40,9 +41,11 @@
   - Today's reports filtering
 
 ### 📊 Data Files
-- `data/buildings.json` - Building locations and status
-- `data/accessibility.json` - Wheelchair entrances and features
-- `data/occupancy.json` - Mock occupancy data
+- `data/buildings.json` - Building locations, status, amenities (28 entries)
+- `data/accessibility.json` - Wheelchair entrances, elevator counts, notes
+- `data/issues.json` - Sample issue backlog feeding trends & summary cards
+- `data/predictions.json` - Time-slot forecasts for predictive flow
+- `data/occupancy.json` - Mock occupancy data (legacy)
 
 ### ☁️ Infrastructure
 - `infrastructure/deploy.sh` - Lambda deployment script
@@ -94,15 +97,17 @@ campusflow/
 ## 🔧 Key Features Implemented
 
 ✅ Interactive campus map with Folium
-✅ Color-coded building pins (blue/orange/red)
-✅ Report issue form
-✅ View accessibility layer
-✅ Show trends with AI summarization
-✅ Top 3 issues display
+✅ Wayfinder routing overlay
+✅ Predictive flow planner (time-slot forecasts)
+✅ Conversational GenAI (Claude/GPT optional)
+✅ Report issue form with S3/photo mock
+✅ Accessibility overlay
+✅ AI-generated trends (mock + real)
 ✅ Real-time data visualization
 ✅ AWS Lambda integration
 ✅ DynamoDB storage
 ✅ Bedrock Claude 3 AI
+✅ Optional OpenAI GPT integration
 ✅ API Gateway ready
 ✅ Mock mode for local development
 ✅ CORS support

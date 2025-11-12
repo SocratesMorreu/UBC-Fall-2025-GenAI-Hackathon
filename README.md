@@ -1,17 +1,26 @@
-# CampusFlow 🏛️
+# ubica (CampusFlow) 🏛️
 
-A real-time campus insight platform helping students and staff discover quiet spaces, report issues instantly, and understand campus well-being: powered by AWS Bedrock and Claude 3.
+UBica is a campus intelligence copilot: it blends live occupancy data, predictive flow modeling, and conversational GenAI to help students and staff find quiet spaces, report issues, and plan their day. The system leans heavily on AWS managed services (API Gateway, Lambda, DynamoDB, S3, CloudWatch) together with AWS Bedrock (Claude 3) – with optional OpenAI GPT integration for extended answers.
 
 ## Features
 
-- 🗺️ **Interactive Campus Map**: Visual representation of buildings with color-coded status
-  - 🔵 Blue = Quiet
-  - 🟠 Orange = Busy  
-  - 🔴 Red = Broken/Issues
-- 📊 **Real-time Issue Reporting**: Students and staff can report problems (e.g., broken outlets, lighting issues, accessibility concerns) in seconds.
-- 🤖 **AI-Powered Insights**: AWS Bedrock (Claude 3) analyzes reports to summarize trends, recurring issues, and peak hours.
-- ♿ **Accessibility Features**: View wheelchair-accessible entrances and facilities
-- 📈 **Trend Analysis**: Displays aggregated metrics: top buildings with issues, most reported problems, and improvement over time.
+- 🗺️ **Interactive Campus Map & Wayfinder**
+  - Multiple base layers (street, light, dark, satellite)
+  - Live legends, building tooltips, and a routing dash to walk between buildings
+- 📊 **Real-time Issue Reporting**
+  - Streamlit form that writes through API Gateway → Lambda → DynamoDB (mock/local fallback included)
+  - Issues are summarized in-app and fed into AI trends
+- 🔮 **Predictive Flow Planner**
+  - Time-slot forecasts (morning/midday/afternoon/evening) sourced from campus data lake
+  - Progress bars, walk times, and amenities to plan ahead
+- 🤖 **GenAI Assistant**
+  - Default: Local inference with deterministic logic (study spots, accessibility, routing)
+  - Optional: AWS Bedrock (Claude 3 Sonnet) or OpenAI GPT for full conversational responses
+  - Blends static data, real-time reports, and occupancy predictions when crafting answers
+- ♿ **Accessibility Overlay**
+  - Wheelchair entrances, elevator counts, accessible washrooms, and guidance notes
+- 🛰️ **AWS-Centered Ops**
+  - Lambda-backed APIs, S3 media uploads, CloudWatch observability, Bedrock (Claude 3) inference, and DynamoDB persistence
 
 ## Architecture
 
@@ -34,10 +43,25 @@ A real-time campus insight platform helping students and staff discover quiet sp
 └────────┬────────┘
          │
          ▼
-┌─────────────────┐
-│  Bedrock        │
-│  (Claude 3)     │
-└─────────────────┘
+┌─────────────────┐      ┌───────────────────┐
+│  Bedrock        │◀────▶│  S3 / CloudWatch  │
+│  (Claude 3)     │      │  (Assets & Logs)  │
+└─────────────────┘      └───────────────────┘
+```
+
+Optional OpenAI GPT support is provided via the same API client abstraction – drop your `OPENAI_API_KEY` into `.env` and the assistant upgrades automatically.
+
+```mermaid
+flowchart TD
+    A[Streamlit Frontend<br/>ubica] -->|HTTPS| B(API Gateway)
+    A --> H[Local Mock Data<br/>issues.json / predictions.json]
+    B --> C[AWS Lambda<br/>backend/lambda_function.py]
+    C --> D[DynamoDB<br/>CampusReports]
+    C --> E[S3<br/>Issue Photos]
+    C --> F[AWS Bedrock<br/>Claude 3 Sonnet]
+    C --> G[CloudWatch Logs/Insights]
+    A --> I[Optional OpenAI GPT<br/>ai_api_client.py]
+    A --> J[Web Search<br/>DuckDuckGo / SerpAPI]
 ```
 
 ## Project Structure
@@ -106,7 +130,11 @@ campusflow/
    ./deploy.sh
    ```
 
-5. **Run Streamlit app:**
+5. **(Optional) Enable Bedrock or OpenAI:**
+   - Bedrock: set `AWS_REGION`, `BEDROCK_MODEL_ID`, and ensure your IAM role has Bedrock access
+   - OpenAI: add `OPENAI_API_KEY` to `.env`
+
+6. **Run Streamlit app:**
    ```bash
    streamlit run frontend/app.py
    ```
@@ -119,8 +147,9 @@ See `infrastructure/README.md` for detailed AWS setup instructions.
 
 1. **View Campus Map**: Open the app to see building statuses
 2. **Report Issues**: Click "Report Issue" and fill out the form
-3. **View Trends**: Click "Show Trends" to see AI-generated summaries
-4. **Accessibility**: Click "View Accessibility" to see accessible features
+3. **Plan Ahead**: Use the predictive flow dropdown or ask the chatbot for “evening study spots”
+4. **Wayfinder**: Choose a start and end building to plot a walking route
+5. **Accessibility**: Toggle the accessibility layer for wheelchair entrances
 
 ## License
 

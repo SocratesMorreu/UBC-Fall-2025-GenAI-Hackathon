@@ -1,0 +1,106 @@
+{
+  "Morning (7-11 AM)": [
+    {
+      "building": "scarfe",
+      "predicted_occupancy": 32,
+      "walk_time_minutes": 4,
+      "best_time": "7:30 AM - 9:00 AM",
+      "confidence": "High",
+      "note": "Quiet education wing with natural light and empty classrooms."
+    },
+    {
+      "building": "koerner",
+      "predicted_occupancy": 45,
+      "walk_time_minutes": 5,
+      "best_time": "8:00 AM - 10:00 AM",
+      "confidence": "Medium",
+      "note": "Lower floors stay calm before mid-morning lecture breaks."
+    },
+    {
+      "building": "chemistry",
+      "predicted_occupancy": 28,
+      "walk_time_minutes": 6,
+      "best_time": "9:00 AM - 11:00 AM",
+      "confidence": "High",
+      "note": "Labs start later; mezzanine study space is usually open."
+    }
+  ],
+  "Midday (11 AM-2 PM)": [
+    {
+      "building": "life",
+      "predicted_occupancy": 62,
+      "walk_time_minutes": 5,
+      "best_time": "11:00 AM - 12:00 PM",
+      "confidence": "Medium",
+      "note": "Arrive early to grab collaborative tables before lunch peak."
+    },
+    {
+      "building": "sauder",
+      "predicted_occupancy": 74,
+      "walk_time_minutes": 3,
+      "best_time": "12:00 PM - 1:30 PM",
+      "confidence": "High",
+      "note": "Trading lab overflow likely; reserve a seat or use level 2 lounge."
+    },
+    {
+      "building": "nest",
+      "predicted_occupancy": 85,
+      "walk_time_minutes": 2,
+      "best_time": "12:30 PM - 2:00 PM",
+      "confidence": "Medium",
+      "note": "Consider takeaway options; seating rotates fastest near the windows."
+    }
+  ],
+  "Afternoon (2-6 PM)": [
+    {
+      "building": "irving",
+      "predicted_occupancy": 48,
+      "walk_time_minutes": 1,
+      "best_time": "2:00 PM - 4:00 PM",
+      "confidence": "High",
+      "note": "East wing quiet carrels reset after lunchtime exodus."
+    },
+    {
+      "building": "forestry",
+      "predicted_occupancy": 36,
+      "walk_time_minutes": 6,
+      "best_time": "3:00 PM - 5:00 PM",
+      "confidence": "Medium",
+      "note": "Wood atrium stays bright and calm with reliable power outlets."
+    },
+    {
+      "building": "earth",
+      "predicted_occupancy": 41,
+      "walk_time_minutes": 7,
+      "best_time": "4:00 PM - 6:00 PM",
+      "confidence": "Medium",
+      "note": "Geo commons gradually empties as labs finish for the day."
+    }
+  ],
+  "Evening (6-10 PM)": [
+    {
+      "building": "koerner",
+      "predicted_occupancy": 52,
+      "walk_time_minutes": 5,
+      "best_time": "6:00 PM - 8:00 PM",
+      "confidence": "High",
+      "note": "Quiet zones open up again after dinner hours."
+    },
+    {
+      "building": "ikb",
+      "predicted_occupancy": 68,
+      "walk_time_minutes": 2,
+      "best_time": "7:00 PM - 9:00 PM",
+      "confidence": "Medium",
+      "note": "Expect steady traffic; book group rooms or use silent floors."
+    },
+    {
+      "building": "ponderosa",
+      "predicted_occupancy": 44,
+      "walk_time_minutes": 4,
+      "best_time": "8:00 PM - 10:00 PM",
+      "confidence": "Medium",
+      "note": "Residence lounges quiet down post-dinner; good for casual study."
+    }
+  ]
+}
