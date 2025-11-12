@@ -20,3 +20,11 @@ env/
 *.tar.gz
 
 
+__pycache__/
+.env
+*.pyc
+.streamlit/
+.DS_Store
+venv/
+.env.*
+node_modules/
