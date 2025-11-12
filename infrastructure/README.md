@@ -19,7 +19,7 @@ aws dynamodb create-table \
   --region us-east-1
 ```
 
-## Step 2: Set Up IAM Role for Lambda
+## Step 2: Setting Up IAM Role for Lambda
 
 1. Create a trust policy file `trust-policy.json`:
 ```json
@@ -62,10 +62,10 @@ aws iam attach-role-policy \
   --policy-arn arn:aws:iam::aws:policy/AmazonBedrockFullAccess
 ```
 
-## Step 3: Enable Bedrock Model Access
+## Step 3: Enable Bedrock Model Access (NVM NO longer required)
 
 1. Go to AWS Bedrock Console
-2. Navigate to "Model access"
+2. Navigate to "Model access" 
 3. Request access to "Anthropic Claude 3 Sonnet"
 4. Wait for approval (usually instant)
 
@@ -77,7 +77,7 @@ cd backend
 ./deploy.sh
 ```
 
-2. Or create manually:
+2. Or creating manually:
 ```bash
 cd backend
 zip -r lambda-deployment.zip *.py
@@ -151,23 +151,6 @@ pip install -r requirements.txt
 ```bash
 streamlit run frontend/app.py
 ```
-
-## Troubleshooting
-
-### Lambda Timeout
-- Increase timeout: `aws lambda update-function-configuration --function-name campusflow-process-report --timeout 60`
-
-### Bedrock Access Denied
-- Ensure model access is granted in Bedrock console
-- Check IAM role has `bedrock:InvokeModel` permission
-
-### DynamoDB Errors
-- Verify table exists: `aws dynamodb describe-table --table-name CampusReports`
-- Check IAM role has DynamoDB permissions
-
-### API Gateway CORS
-- Ensure CORS is enabled in API Gateway settings
-- Check Lambda returns proper CORS headers
 
 ## Cost Estimation
 

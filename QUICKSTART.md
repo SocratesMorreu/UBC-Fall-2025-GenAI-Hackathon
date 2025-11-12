@@ -99,34 +99,6 @@ For production use with real AI summarization and data storage.
    - See wheelchair-accessible entrances on map
    - View accessibility details in sidebar
 
-## Troubleshooting
-
-### "Module not found" errors
-```bash
-pip install -r requirements.txt
-```
-
-### Map not displaying
-- Check that `folium` and `streamlit-folium` are installed
-- Try refreshing the browser
-
-### API connection errors
-- Verify `.env` file has correct `API_GATEWAY_URL`
-- Check AWS credentials are configured
-- Ensure Lambda function is deployed
-
-### Bedrock errors
-- Verify Bedrock model access is enabled
-- Check IAM role has Bedrock permissions
-- Ensure correct model ID in `.env`
-
-## Next Steps
-
-- Customize building data in `data/buildings.json`
-- Add more buildings or adjust coordinates
-- Modify AI prompts in `backend/bedrock_client.py`
-- Deploy to production following `infrastructure/README.md`
-
 ## Support
 
 For detailed setup instructions, see:

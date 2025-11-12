@@ -14,18 +14,17 @@ RUNTIME="python3.11"
 HANDLER="lambda_function.lambda_handler"
 ROLE_NAME="CampusFlowLambdaRole"
 
-# Create deployment package
 echo "📦 Creating deployment package..."
 cd "$(dirname "$0")/../backend"
 mkdir -p package
 
-# Install dependencies
+# Installs dependencies
 pip install -r requirements.txt -t package/
 
 # Copy function code
 cp *.py package/
 
-# Create ZIP file
+# Creates ZIP file
 cd package
 zip -r ../lambda-deployment.zip .
 cd ..
