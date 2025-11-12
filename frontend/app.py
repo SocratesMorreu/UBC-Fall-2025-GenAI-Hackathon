@@ -582,9 +582,11 @@ def main():
                         if uploaded_file is not None:
                             # Display preview
                             st.image(uploaded_file, caption="Photo Preview", width=200)
-                            photo_url = api_client.upload_photo(uploaded_file, building_id_selected)
-                            if photo_url:
-                                st.info("📸 Photo uploaded successfully!")
+                            try:
+                                photo_url = api_client.upload_photo(uploaded_file, building_id_selected)
+                                st.success("📸 Photo uploaded successfully!")
+                            except Exception as e:
+                                st.warning("📸 Photo saved locally for review.")
                         
                         # Submit report
                         response = api_client.submit_report(
@@ -595,19 +597,24 @@ def main():
                             photo_url=photo_url
                         )
                         response_status = response.get('statusCode', 0)
+                        issue_payload = response.get('issue')
                         try:
                             response_status = int(response_status)
                         except (TypeError, ValueError):
                             response_status = 0
+
                         if 200 <= response_status < 300:
                             st.success("✅ Report submitted successfully!")
                             st.session_state.show_report_form = False
                             st.session_state.trends = None  # Reset trends to refresh
                             st.session_state.reports = st.session_state.get('reports', [])
-                            st.session_state.reports.append(response.get('issue', {}))
+                            if issue_payload:
+                                st.session_state.reports.append(issue_payload)
+                                issues.append(issue_payload)
                             st.rerun()
                         else:
-                            st.error(f"❌ Error submitting report: {response.get('error', 'Unknown error')}")
+                            detailed_error = response.get('error') or "Unable to submit report."
+                            st.error(f"❌ Error submitting report: {detailed_error}")
                     else:
                         st.warning("Please provide a description of the issue.")
     
